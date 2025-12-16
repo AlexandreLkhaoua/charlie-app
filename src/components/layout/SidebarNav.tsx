@@ -20,9 +20,12 @@ export function SidebarNav() {
   // Get initials from display name
   const getInitials = () => {
     if (!profile?.displayName) return 'DU';
-    const names = profile.displayName.trim().split(' ');
-    if (names.length === 1) return names[0].substring(0, 2).toUpperCase();
-    return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    const names = profile.displayName.trim().split(' ').filter(Boolean);
+    if (names.length === 0) return 'DU';
+    const firstName = names[0] ?? '';
+    if (names.length === 1) return firstName.substring(0, 2).toUpperCase();
+    const lastName = names[names.length - 1] ?? '';
+    return ((firstName[0] ?? '') + (lastName[0] ?? '')).toUpperCase();
   };
   
   const displayName = profile?.displayName || 'Demo User';
