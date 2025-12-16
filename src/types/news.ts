@@ -1,0 +1,55 @@
+// News tags
+export type NewsTag = 
+  | 'rates' 
+  | 'inflation' 
+  | 'equity' 
+  | 'fx' 
+  | 'earnings' 
+  | 'geopolitics' 
+  | 'commodities'
+  | 'crypto'
+  | 'macro'
+  | 'tech';
+
+// News item
+export interface NewsItem {
+  id: string;
+  title: string;
+  summary: string;
+  source: string;
+  author?: string;
+  published_at: string;
+  tags: NewsTag[];
+  image_url?: string;
+  full_text?: string;
+  url?: string;
+}
+
+// Impact sentiment
+export type ImpactSentiment = 'positive' | 'negative' | 'neutral' | 'mixed';
+
+// News impact on portfolio
+export interface NewsImpactPack {
+  news_id: string;
+  sentiment: ImpactSentiment;
+  confidence: 'high' | 'medium' | 'low';
+  
+  // Qualitative impact
+  summary: string;
+  bullets: string[];
+  
+  // Quantitative estimates
+  estimated_impact_percent: number;
+  estimated_impact_eur: number;
+  
+  // Affected positions
+  affected_positions: {
+    ticker: string;
+    name: string;
+    impact_direction: 'up' | 'down' | 'neutral';
+    reason: string;
+  }[];
+  
+  // Recommended actions (educational)
+  recommendations: string[];
+}

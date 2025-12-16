@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio Copilot - Charlie AI
 
-## Getting Started
+A modern, AI-powered portfolio analysis dashboard built with Next.js 14, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## 🎯 Features
+
+### Dashboard
+- Portfolio overview with key metrics
+- Asset allocation breakdown (by class, currency, region)
+- Position table with top holdings
+- Risk flags and alerts
+- Scenario analysis (rate cuts, equity crash, FX movements)
+
+### Market News
+- Real-time news feed
+- AI-powered impact analysis on your portfolio
+- Translation support (EN/FR)
+- Affected positions highlighting
+
+### Copilot Chat
+- Natural language questions about your portfolio
+- Contextual answers based on your exposures and risks
+- Quick prompts for common questions
+- Structured responses with data points
+
+## 🚀 Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📁 Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── page.tsx           # Landing page
+│   ├── layout.tsx         # Root layout
+│   └── demo/              # Demo app pages
+│       ├── layout.tsx     # Demo layout with sidebar
+│       ├── dashboard/     # Portfolio dashboard
+│       ├── news/          # Market news & impact
+│       ├── chat/          # Copilot chat
+│       └── tools/         # Future tools (placeholder)
+├── components/
+│   ├── chat/              # Chat-related components
+│   ├── layout/            # AppShell, Sidebar, Topbar
+│   ├── news/              # News list, detail, impact
+│   ├── providers/         # React context providers
+│   └── ui/                # Reusable UI components
+├── lib/
+│   ├── dataProvider.ts    # Data provider interface
+│   ├── index.ts           # Provider exports
+│   └── mock/
+│       ├── data.ts        # Demo data (portfolios, news)
+│       └── mockProvider.ts # Mock implementation
+└── types/
+    ├── analytics.ts       # Analytics types
+    ├── chat.ts            # Chat types
+    ├── news.ts            # News types
+    ├── portfolio.ts       # Portfolio types
+    └── index.ts           # Type exports
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔧 Architecture
 
-## Learn More
+### Data Provider Pattern
 
-To learn more about Next.js, take a look at the following resources:
+All data access goes through a `DataProvider` interface:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```typescript
+interface DataProvider {
+  getPortfolio(profile?: PortfolioProfile): Promise<Portfolio>;
+  getAnalytics(profile?: PortfolioProfile): Promise<AnalyticsOutput>;
+  getNews(): Promise<NewsItem[]>;
+  getNewsById(id: string): Promise<NewsItem | null>;
+  getNewsImpact(newsId: string, profile?: PortfolioProfile): Promise<NewsImpactPack>;
+  sendChat(messages: ChatMessage[], context: ChatContext): Promise<ChatMessage>;
+  translate(text: string, to: 'EN' | 'FR'): Promise<string>;
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Currently uses `mockProvider` with fake data. To integrate a real backend:
 
-## Deploy on Vercel
+1. Create `lib/apiProvider.ts` implementing `DataProvider`
+2. Update `lib/index.ts` to export `apiProvider` instead of `mockProvider`
+3. No changes needed to UI components
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Demo Portfolios
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Three demo portfolios available:
+- **Prudent**: Conservative, bond-heavy, EUR-only
+- **Balanced**: Mixed allocation, some USD exposure
+- **Aggressive**: Equity-heavy, tech-focused, crypto exposure
+
+## 🎨 Styling
+
+- Tailwind CSS for utility-first styling
+- Custom color palette (primary blue, accent purple)
+- Responsive design for desktop and tablet
+- Dark sidebar with light content area
+
+## 📝 Notes
+
+- **Demo Mode**: All data is simulated. No real backend calls.
+- **AI Simulation**: Chat and translation use deterministic mock functions.
+- **Educational Only**: Not investment advice.
+
+## 🔜 Roadmap
+
+- [ ] Real backend integration
+- [ ] User authentication
+- [ ] Portfolio import (CSV, broker API)
+- [ ] Real-time news API
+- [ ] LLM integration (OpenAI, Anthropic)
+- [ ] Advanced analytics
+- [ ] Mobile responsive improvements
+
+## 📄 License
+
+Private - All rights reserved.
