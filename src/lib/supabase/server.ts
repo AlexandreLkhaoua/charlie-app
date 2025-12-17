@@ -3,7 +3,7 @@
  * ----------------------
  * ⚠️  SERVER ONLY - DO NOT IMPORT IN CLIENT COMPONENTS ⚠️
  *
- * This module provides a Supabase admin client using the service role key.
+ * This module provides a Supabase admin client using the Supabase secret key.
  * It bypasses Row Level Security (RLS) and should only be used in:
  * - API routes (app/api/*)
  * - Server actions
@@ -92,7 +92,7 @@ export function getSupabaseAdminClient(): SupabaseClient<Database> {
     return supabaseAdmin;
   }
 
-  supabaseAdmin = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+  supabaseAdmin = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY, {
     auth: {
       // Disable auto-refresh and persistence for server-side usage
       autoRefreshToken: false,

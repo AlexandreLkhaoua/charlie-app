@@ -33,8 +33,12 @@ export async function upsertNewsItems(items: NormalizedNewsItem[]): Promise<Upse
     }
 
     // 1) On regarde s'il existe déjà une news avec la même URL
-    const { data: existing, error: selectError } = await supabase
-      .from('news_items')
+    const {
+      data: existing,
+      error: selectError,
+    } = await supabase
+      // Cast léger pour éviter les problèmes de typage avec le client Supabase
+      .from('news_items' as never)
       .select('*')
       .eq('url', item.url)
       .maybeSingle();
@@ -64,7 +68,9 @@ export async function upsertNewsItems(items: NormalizedNewsItem[]): Promise<Upse
         content_hash: item.content_hash,
       };
 
-      const { error: insertError } = await supabase.from('news_items').insert(payload);
+      const { error: insertError } = await supabase
+        .from('news_items' as never)
+        .insert(payload as never);
 
       if (insertError) {
         console.error('[news.ingest] Failed to insert news_item:', {
@@ -102,15 +108,17 @@ export async function upsertNewsItems(items: NormalizedNewsItem[]): Promise<Upse
         continue;
       }
 
+      const existingRecord = existing as { id: string; url: string };
+
       const { error: updateError } = await supabase
-        .from('news_items')
-        .update(update)
-        .eq('id', existing.id);
+        .from('news_items' as never)
+        .update(update as never)
+        .eq('id', existingRecord.id);
 
       if (updateError) {
         console.error('[news.ingest] Failed to update news_item:', {
-          id: existing.id,
-          url: existing.url,
+          id: existingRecord.id,
+          url: existingRecord.url,
           error: updateError.message,
         });
         skipped += 1;
