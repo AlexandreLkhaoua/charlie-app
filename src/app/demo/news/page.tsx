@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePortfolioContext } from '@/components/providers/PortfolioProvider';
 import { dataProvider } from '@/lib';
-import { NewsItem, NewsImpactPack } from '@/types';
+import type { NewsItem, NewsImpactPack, NormalizedNewsItem } from '@/types';
 import { NewsList } from '@/components/news/NewsList';
 import { NewsDetail } from '@/components/news/NewsDetail';
 import { ImpactPanel } from '@/components/news/ImpactPanel';
@@ -24,7 +24,24 @@ export default function NewsPage() {
     async function loadNews() {
       setIsLoading(true);
       try {
-        const newsData = await dataProvider.getNews();
+        const response = await fetch('/api/news');
+        if (!response.ok) {
+          throw new Error(`Failed to load news: ${response.status}`);
+        }
+
+        const json: { provider: string; items: NormalizedNewsItem[] } = await response.json();
+
+        const newsData: NewsItem[] = json.items.map((item, index) => ({
+          id: item.content_hash || `${item.provider}-${index}`,
+          title: item.title,
+          summary: item.summary ?? '',
+          source: item.source ?? item.provider,
+          published_at: item.published_at,
+          tags: [], // TODO: mapper les tags à partir des tickers / catégories provider
+          image_url: item.image_url ?? undefined,
+          url: item.url,
+        }));
+
         // Sort by date (newest first)
         const sorted = [...newsData].sort((a, b) => {
           return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();

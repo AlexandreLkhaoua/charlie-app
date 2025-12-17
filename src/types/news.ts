@@ -11,7 +11,7 @@ export type NewsTag =
   | 'macro'
   | 'tech';
 
-// News item
+// News item (front-end view model)
 export interface NewsItem {
   id: string;
   title: string;
@@ -23,6 +23,22 @@ export interface NewsItem {
   image_url?: string;
   full_text?: string;
   url?: string;
+}
+
+// Normalized market news item (backend/storage model)
+// Aligné sur la table `news_items` de Supabase et les providers externes.
+export interface NormalizedNewsItem {
+  provider: string;
+  provider_id: string | null;
+  url: string;
+  title: string;
+  summary: string | null;
+  source: string | null;
+  image_url: string | null;
+  published_at: string; // ISO string
+  lang: string | null;
+  tickers: string[];
+  content_hash: string;
 }
 
 // Impact sentiment
