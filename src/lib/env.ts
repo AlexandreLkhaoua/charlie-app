@@ -1,8 +1,8 @@
 /**
  * Environment Variables Validation
  * ---------------------------------
- * Validates all required environment variables at build/runtime.
- * Import this file early in your application to catch missing env vars.
+ * Lazy validation: variables are validated when accessed, not at import time.
+ * This prevents build failures when server-only variables are missing.
  */
 
 import { z } from 'zod';
@@ -28,11 +28,16 @@ const envSchema = z.object({
 // Type for the validated environment
 export type Env = z.infer<typeof envSchema>;
 
+let cachedEnv: Env | null = null;
+
 /**
  * Validates environment variables and returns typed env object.
  * Throws descriptive error if validation fails.
+ * Cached after first call.
  */
 function validateEnv(): Env {
+  if (cachedEnv) return cachedEnv;
+
   const parsed = envSchema.safeParse({
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -49,25 +54,30 @@ function validateEnv(): Env {
     throw new Error(`❌ Invalid environment variables:\n${errors}`);
   }
 
-  const env = parsed.data;
+  const validatedEnv = parsed.data;
 
   // Conditional validation: ensure the selected provider has its API key
-  if (env.MARKET_NEWS_PROVIDER === 'marketaux' && !env.MARKETAUX_API_KEY) {
+  if (validatedEnv.MARKET_NEWS_PROVIDER === 'marketaux' && !validatedEnv.MARKETAUX_API_KEY) {
     throw new Error('❌ MARKETAUX_API_KEY is required when MARKET_NEWS_PROVIDER is "marketaux"');
   }
 
-  if (env.MARKET_NEWS_PROVIDER === 'finnhub' && !env.FINNHUB_API_KEY) {
+  if (validatedEnv.MARKET_NEWS_PROVIDER === 'finnhub' && !validatedEnv.FINNHUB_API_KEY) {
     throw new Error('❌ FINNHUB_API_KEY is required when MARKET_NEWS_PROVIDER is "finnhub"');
   }
 
-  return env;
+  cachedEnv = validatedEnv;
+  return cachedEnv;
 }
 
 /**
- * Validated environment variables.
- * Access these instead of process.env directly for type safety.
+ * Validated environment variables (lazy).
+ * Validates on first access, not at import time.
  */
-export const env = validateEnv();
+export const env = new Proxy({} as Env, {
+  get(_target, prop: keyof Env) {
+    return validateEnv()[prop];
+  },
+});
 
 /**
  * Helper to get the active news provider API key
