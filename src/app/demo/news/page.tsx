@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePortfolioContext } from '@/components/providers/PortfolioProvider';
 import { dataProvider } from '@/lib';
-import type { NewsItem, NewsImpactPack, NormalizedNewsItem } from '@/types';
+import type { NewsItem, NewsImpactPack } from '@/types';
+import type { NewsItem as StoredNewsItem } from '@/lib/supabase/server';
 import { NewsList } from '@/components/news/NewsList';
 import { NewsDetail } from '@/components/news/NewsDetail';
 import { ImpactPanel } from '@/components/news/ImpactPanel';
@@ -29,10 +30,10 @@ export default function NewsPage() {
           throw new Error(`Failed to load news: ${response.status}`);
         }
 
-        const json: { provider: string; items: NormalizedNewsItem[] } = await response.json();
+        const json: { provider: string; items: StoredNewsItem[] } = await response.json();
 
-        const newsData: NewsItem[] = json.items.map((item, index) => ({
-          id: item.content_hash || `${item.provider}-${index}`,
+        const newsData: NewsItem[] = json.items.map((item) => ({
+          id: item.id,
           title: item.title,
           summary: item.summary ?? '',
           source: item.source ?? item.provider,

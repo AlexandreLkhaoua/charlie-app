@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { env } from '@/lib/env';
 import { fetchMarketauxNews } from '@/lib/news/providers/marketaux';
-import { fetchFinnhubNews } from '@/lib/news/providers/finnhub';
+import { upsertNewsItems } from '@/lib/news/ingest';
+import { getSupabaseAdminClient, type NewsItem as StoredNewsItem } from '@/lib/supabase/server';
 import type { NormalizedNewsItem } from '@/types';
 
 export async function GET(request: Request) {
@@ -10,7 +10,6 @@ export async function GET(request: Request) {
   const limitParam = searchParams.get('limit');
   const symbolsParam = searchParams.get('symbols');
   const languageParam = searchParams.get('language');
-  const providerParam = searchParams.get('provider');
 
   const limit = limitParam ? Number.parseInt(limitParam, 10) || 50 : 50;
   const symbols = symbolsParam
@@ -21,23 +20,30 @@ export async function GET(request: Request) {
     : [];
   const language = languageParam || 'en';
 
-  const provider = (providerParam || env.MARKET_NEWS_PROVIDER) as 'marketaux' | 'finnhub';
-
   try {
     let items: NormalizedNewsItem[] = [];
 
-    if (provider === 'marketaux') {
-      items = await fetchMarketauxNews({ symbols, limit, language });
-    } else if (provider === 'finnhub') {
-      items = await fetchFinnhubNews({ symbols, limit, language });
-    } else {
-      return NextResponse.json(
-        { error: `Unsupported market news provider: ${provider}` },
-        { status: 400 }
-      );
+    // V1 : provider unique = Marketaux
+    // On ignore pour l'instant les autres providers potentiels (Finnhub, etc.)
+    items = await fetchMarketauxNews({ symbols, limit, language });
+
+    // Persist les items pour constituer un feed cumulatif
+    await upsertNewsItems(items);
+
+    // Retourne le feed stocké (le plus récent d'abord)
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase
+      .rpc('get_latest_news' as never, { p_limit: limit } as never);
+
+    if (error) {
+      console.error('[GET /api/news] Error fetching stored news:', error);
+      // Fallback : renvoyer les items frais si la lecture échoue
+      return NextResponse.json({ provider: 'marketaux', items });
     }
 
-    return NextResponse.json({ provider, items });
+    const storedItems = (data || []) as StoredNewsItem[];
+
+    return NextResponse.json({ provider: 'marketaux', items: storedItems });
   } catch (error) {
     console.error('[GET /api/news] Error fetching market news:', error);
     return NextResponse.json(

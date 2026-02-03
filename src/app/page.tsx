@@ -70,12 +70,20 @@ export default function HomePage() {
             </div>
             <span className="text-xl font-semibold text-white tracking-tight">Charlie</span>
           </div>
-          <Link
-            href="/demo/dashboard"
-            className="text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            Try the demo
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/login"
+              className="text-sm text-slate-400 hover:text-white transition-colors"
+            >
+              Login
+            </Link>
+            <Link
+              href="/demo/dashboard"
+              className="text-sm px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+            >
+              Try Demo
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -93,20 +101,20 @@ export default function HomePage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
             <Link
-              href="/demo/dashboard"
+              href="/signup"
               className="inline-flex items-center justify-center px-8 py-3.5 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition-colors"
             >
-              Try the demo
+              Get Started
               <svg className="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
-            <a
-              href="#waitlist"
+            <Link
+              href="/demo/dashboard"
               className="inline-flex items-center justify-center px-8 py-3.5 border border-slate-700 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors"
             >
-              Join the waitlist
-            </a>
+              Try Demo (No login)
+            </Link>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
