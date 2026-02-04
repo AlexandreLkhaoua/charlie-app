@@ -16,7 +16,7 @@ const profileLabels: Record<PortfolioProfile, string> = {
 
 export function Topbar() {
   const { profile, setProfile, isLoading } = usePortfolioContext();
-  const { profile: userProfile, isAuthenticated } = useProfile();
+  const { profile: userProfile, isAuthenticated, userEmail } = useProfile();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -80,7 +80,7 @@ export function Topbar() {
                   </span>
                 </div>
                 <span className="hidden md:inline text-sm text-slate-700 font-medium">
-                  {userProfile?.displayName || 'User'}
+                  {userEmail || userProfile?.displayName || 'User'}
                 </span>
                 <svg
                   className="w-4 h-4 text-slate-400"

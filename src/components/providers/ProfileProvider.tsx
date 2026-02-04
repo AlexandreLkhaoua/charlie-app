@@ -13,6 +13,7 @@ interface ProfileContextType {
   profile: UserProfile | null;
   isLoaded: boolean;
   isAuthenticated: boolean;
+  userEmail: string | null;
   saveProfile: (updates: Partial<UserProfile>) => Promise<void>;
   resetProfile: () => Promise<void>;
   getPersonalizationContext: () => string;
@@ -24,6 +25,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const supabase = createClient();
 
   // Load profile on mount
@@ -37,6 +39,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       } else if (event === 'SIGNED_OUT') {
         setProfile(null);
         setIsAuthenticated(false);
+        setUserEmail(null);
         setIsLoaded(true);
       }
     });
@@ -55,11 +58,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         const localProfile = getLocalProfile();
         setProfile(localProfile);
         setIsAuthenticated(false);
+        setUserEmail(null);
         setIsLoaded(true);
         return;
       }
 
       // User authenticated - load from database
+      setUserEmail(user.email || null);
+      
       const { data: dbProfile, error } = await supabase
         .from('profiles')
         .select('*')
@@ -208,6 +214,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         profile, 
         isLoaded,
         isAuthenticated,
+        userEmail,
         saveProfile, 
         resetProfile,
         getPersonalizationContext: getContext,

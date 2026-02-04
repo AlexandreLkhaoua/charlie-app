@@ -14,7 +14,7 @@ let supabaseAdmin: ReturnType<typeof createClient<Database>> | null = null;
 export function getSupabaseAdminClient() {
   if (supabaseAdmin) return supabaseAdmin;
 
-  supabaseAdmin = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+  supabaseAdmin = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

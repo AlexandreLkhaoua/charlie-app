@@ -10,7 +10,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   // Supabase (server-only)
   SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'SUPABASE_SERVICE_ROLE_KEY is required'),
+  SUPABASE_SECRET_KEY: z.string().min(1, 'SUPABASE_SECRET_KEY is required'),
 
   // News refresh endpoint protection
   NEWS_REFRESH_SECRET: z.string().min(16, 'NEWS_REFRESH_SECRET must be at least 16 characters'),
@@ -40,7 +40,7 @@ function validateEnv(): Env {
 
   const parsed = envSchema.safeParse({
     SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
     NEWS_REFRESH_SECRET: process.env.NEWS_REFRESH_SECRET,
     MARKET_NEWS_PROVIDER: process.env.MARKET_NEWS_PROVIDER,
     MARKETAUX_API_KEY: process.env.MARKETAUX_API_KEY,
