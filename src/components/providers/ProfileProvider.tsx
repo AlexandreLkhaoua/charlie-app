@@ -51,6 +51,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = async () => {
     try {
+      // Check if Supabase is configured
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        const localProfile = getLocalProfile();
+        setProfile(localProfile);
+        setIsAuthenticated(false);
+        setUserEmail(null);
+        setIsLoaded(true);
+        return;
+      }
+      
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
