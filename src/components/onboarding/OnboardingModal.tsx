@@ -73,11 +73,11 @@ export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: Onbo
     const shouldShowReminder = isCompleted && login_count > 0 && login_count % REMINDER_INTERVAL === 0;
 
     if (!isCompleted || shouldShowReminder) {
-      // Check localStorage snooze (commented out for testing)
-      // const snoozeUntil = localStorage.getItem(SNOOZE_KEY);
-      // if (snoozeUntil && new Date(snoozeUntil) > new Date()) {
-      //   return; // Still snoozed
-      // }
+      // Check localStorage snooze
+      const snoozeUntil = localStorage.getItem(SNOOZE_KEY);
+      if (snoozeUntil && new Date(snoozeUntil) > new Date()) {
+        return; // Still snoozed
+      }
 
       // Show modal after delay
       const delay = _testDelay !== undefined ? _testDelay : SHOW_DELAY_MS;

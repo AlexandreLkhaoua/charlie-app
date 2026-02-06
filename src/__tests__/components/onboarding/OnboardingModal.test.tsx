@@ -148,9 +148,9 @@ describe('OnboardingModal', () => {
     });
 
     // Check all questions are present
-    expect(screen.getByText(/Quel est votre objectif principal/)).toBeInTheDocument();
-    expect(screen.getByText(/Quel est votre horizon/)).toBeInTheDocument();
-    expect(screen.getByText(/Si votre portefeuille baisse de -20%/)).toBeInTheDocument();
+    expect(screen.getByText(/What is your primary goal/)).toBeInTheDocument();
+    expect(screen.getByText(/What is your investment horizon/)).toBeInTheDocument();
+    expect(screen.getByText(/If your portfolio drops -20%/)).toBeInTheDocument();
   });
 
   it('should disable submit button until all questions answered', async () => {
