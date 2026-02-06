@@ -44,8 +44,8 @@ const severityConfig: Record<
 export function FlagsList({ flags, onFlagClick, showAskCopilot = true }: FlagsListProps) {
   if (flags.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h3 className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-4">
           Risk Assessment
         </h3>
         <div className="flex flex-col items-center justify-center py-6 text-slate-500">
@@ -55,7 +55,7 @@ export function FlagsList({ flags, onFlagClick, showAskCopilot = true }: FlagsLi
             </svg>
           </div>
           <p className="text-sm font-medium text-slate-700">No significant risks detected</p>
-          <p className="text-xs text-slate-400 mt-1">Your portfolio appears well-balanced</p>
+          <p className="text-xs text-slate-500 mt-1">Your portfolio appears well-balanced</p>
         </div>
       </div>
     );
@@ -71,9 +71,9 @@ export function FlagsList({ flags, onFlagClick, showAskCopilot = true }: FlagsLi
   const mediumCount = flags.filter(f => f.severity === 'medium').length;
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4 md:p-5 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+        <h3 className="text-xs font-medium text-slate-600 uppercase tracking-wide">
           Key Risk Indicators
         </h3>
         <div className="flex items-center gap-2 text-xs">
@@ -99,8 +99,8 @@ export function FlagsList({ flags, onFlagClick, showAskCopilot = true }: FlagsLi
           return (
             <div
               key={flag.id}
-              className={`rounded-lg border p-4 ${config.bgColor} ${config.borderColor} ${
-                onFlagClick ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''
+              className={`rounded-xl border p-4 ${config.bgColor} ${config.borderColor} ${
+                onFlagClick ? 'cursor-pointer hover:opacity-90 transition-opacity duration-200' : ''
               }`}
               onClick={() => onFlagClick?.(flag)}
             >

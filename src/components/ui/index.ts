@@ -9,3 +9,7 @@ export { ScrollArea, ScrollBar } from './scroll-area';
 export { Separator } from './separator';
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip';
 export { Skeleton } from './skeleton';
+export { AllocationBars } from './AllocationBars';
+export { PositionsTable } from './PositionsTable';
+export { FlagsList } from './FlagsList';
+export { ScenarioCards } from './ScenarioCards';

@@ -19,11 +19,12 @@ vi.mock('next/navigation', () => ({
   usePathname: vi.fn(),
 }));
 
-vi.mock('@/components/onboarding/OnboardingModal', () => ({
-  OnboardingModal: ({ userId }: { userId: string }) => (
-    <div data-testid="onboarding-modal">Modal for {userId}</div>
-  ),
-}));
+vi.mock('@/components/onboarding/OnboardingModal', () => {
+  function MockOnboardingModal({ userId }: { userId: string }) {
+    return <div data-testid="onboarding-modal">Modal for {userId}</div>;
+  }
+  return { OnboardingModal: MockOnboardingModal };
+});
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -33,11 +34,15 @@ const createWrapper = () => {
     },
   });
   
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+  function TestQueryClientWrapper({ children }: { children: React.ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    );
+  }
+  
+  return TestQueryClientWrapper;
 };
 
 describe('OnboardingWrapper', () => {
@@ -76,9 +81,9 @@ describe('OnboardingWrapper', () => {
     });
   });
 
-  it('should not render on /login page', async () => {
+  it('should not render on /auth page', async () => {
     const { usePathname } = await import('next/navigation');
-    vi.mocked(usePathname).mockReturnValue('/login');
+    vi.mocked(usePathname).mockReturnValue('/auth');
     
     mockSupabaseClient.auth.getUser.mockResolvedValue({
       data: { user: mockUser },
@@ -92,9 +97,9 @@ describe('OnboardingWrapper', () => {
     });
   });
 
-  it('should not render on /signup page', async () => {
+  it('should not render on /auth signup page', async () => {
     const { usePathname } = await import('next/navigation');
-    vi.mocked(usePathname).mockReturnValue('/signup');
+    vi.mocked(usePathname).mockReturnValue('/auth');
     
     mockSupabaseClient.auth.getUser.mockResolvedValue({
       data: { user: mockUser },

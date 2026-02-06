@@ -82,7 +82,7 @@ export default function ProfilePage() {
         </Link>
         <div>
           <h1 className="text-xl font-semibold text-slate-900">Profile</h1>
-          <p className="text-sm text-slate-500">Customize your Charlie experience</p>
+          <p className="text-sm text-slate-600">Customize your Charlie experience</p>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ export default function ProfilePage() {
       <div className="space-y-6">
         
         {/* Display Name */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
           <label className="block text-sm font-medium text-slate-700 mb-2">Display Name</label>
           <input
             type="text"
@@ -103,14 +103,14 @@ export default function ProfilePage() {
         </div>
 
         {/* Experience Level */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
           <label className="block text-sm font-medium text-slate-700 mb-3">Investing Experience</label>
           <div className="grid grid-cols-3 gap-2">
             {(['beginner', 'intermediate', 'advanced'] as InvestingExperience[]).map((level) => (
               <button
                 key={level}
                 onClick={() => updateProfile({ investingExperience: level })}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   profile.investingExperience === level
                     ? 'bg-slate-900 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -128,14 +128,14 @@ export default function ProfilePage() {
         </div>
 
         {/* Language Preference */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
           <label className="block text-sm font-medium text-slate-700 mb-3">Preferred Language</label>
           <div className="grid grid-cols-2 gap-2">
             {(['EN', 'FR'] as PreferredLanguage[]).map((lang) => (
               <button
                 key={lang}
                 onClick={() => updateProfile({ preferredLanguage: lang })}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   profile.preferredLanguage === lang
                     ? 'bg-slate-900 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -148,14 +148,14 @@ export default function ProfilePage() {
         </div>
 
         {/* Investment Horizon */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
           <label className="block text-sm font-medium text-slate-700 mb-3">Investment Horizon</label>
           <div className="grid grid-cols-4 gap-2">
             {(['<1y', '1-3y', '3-7y', '7y+'] as InvestmentHorizon[]).map((horizon) => (
               <button
                 key={horizon}
                 onClick={() => updateProfile({ investmentHorizon: horizon })}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   profile.investmentHorizon === horizon
                     ? 'bg-slate-900 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -169,14 +169,14 @@ export default function ProfilePage() {
         </div>
 
         {/* Risk Comfort */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
           <label className="block text-sm font-medium text-slate-700 mb-3">Risk Comfort</label>
           <div className="grid grid-cols-3 gap-2">
             {(['low', 'medium', 'high'] as RiskComfort[]).map((risk) => (
               <button
                 key={risk}
                 onClick={() => updateProfile({ riskComfort: risk })}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   profile.riskComfort === risk
                     ? 'bg-slate-900 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -189,7 +189,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Investment Goals */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
           <label className="block text-sm font-medium text-slate-700 mb-3">Investment Goals</label>
           <p className="text-xs text-slate-500 mb-3">Select all that apply</p>
           <div className="grid grid-cols-2 gap-2">
@@ -202,7 +202,7 @@ export default function ProfilePage() {
               <button
                 key={key}
                 onClick={() => toggleGoal(key)}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   profile.goals.includes(key)
                     ? 'bg-slate-900 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -215,14 +215,14 @@ export default function ProfilePage() {
         </div>
 
         {/* Answer Style */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
           <label className="block text-sm font-medium text-slate-700 mb-3">Preferred Answer Style</label>
           <div className="grid grid-cols-3 gap-2">
             {(['concise', 'standard', 'detailed'] as AnswerStyle[]).map((style) => (
               <button
                 key={style}
                 onClick={() => updateProfile({ answerStyle: style })}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   profile.answerStyle === style
                     ? 'bg-slate-900 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -235,7 +235,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Content Priority */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
           <label className="block text-sm font-medium text-slate-700 mb-3">Content Focus</label>
           <p className="text-xs text-slate-500 mb-3">What should Charlie prioritize?</p>
           <div className="grid grid-cols-3 gap-2">
@@ -247,7 +247,7 @@ export default function ProfilePage() {
               <button
                 key={key}
                 onClick={() => updateProfile({ contentPriority: key })}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   profile.contentPriority === key
                     ? 'bg-slate-900 text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -260,7 +260,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Jargon Toggle */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <label className="block text-sm font-medium text-slate-700">Avoid Financial Jargon</label>
@@ -287,13 +287,13 @@ export default function ProfilePage() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex-1 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors disabled:opacity-50"
+            className="flex-1 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50"
           >
             {isSaving ? 'Saving...' : 'Save Preferences'}
           </button>
           <button
             onClick={handleReset}
-            className="px-6 py-3 bg-slate-100 text-slate-600 rounded-lg font-medium hover:bg-slate-200 transition-colors"
+            className="px-6 py-3 bg-slate-100 text-slate-600 rounded-lg font-medium hover:bg-slate-200 transition-colors duration-200"
           >
             Reset
           </button>
@@ -306,7 +306,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Disclaimer */}
-      <p className="text-xs text-slate-400 text-center">
+      <p className="text-xs text-slate-500 text-center">
         Your preferences are stored locally on this device.
       </p>
     </div>

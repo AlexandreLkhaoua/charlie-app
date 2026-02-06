@@ -10,6 +10,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   // Supabase (server-only)
   SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
+  SUPABASE_ANON_KEY: z.string().min(1, 'SUPABASE_ANON_KEY is required'),
   SUPABASE_SECRET_KEY: z.string().min(1, 'SUPABASE_SECRET_KEY is required'),
 
   // News refresh endpoint protection
@@ -40,6 +41,7 @@ function validateEnv(): Env {
 
   const parsed = envSchema.safeParse({
     SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
     SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
     NEWS_REFRESH_SECRET: process.env.NEWS_REFRESH_SECRET,
     MARKET_NEWS_PROVIDER: process.env.MARKET_NEWS_PROVIDER,

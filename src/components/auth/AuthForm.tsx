@@ -48,7 +48,7 @@ export function AuthForm({ mode: initialMode = 'login', redirectTo }: AuthFormPr
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/demo/dashboard`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
 
@@ -58,7 +58,7 @@ export function AuthForm({ mode: initialMode = 'login', redirectTo }: AuthFormPr
       } else {
         setSuccess(true);
         setTimeout(() => {
-          router.push(redirectTo || '/demo/dashboard');
+          router.push(redirectTo || '/dashboard');
           router.refresh();
         }, 2000);
       }
@@ -72,7 +72,7 @@ export function AuthForm({ mode: initialMode = 'login', redirectTo }: AuthFormPr
         setError(error.message);
         setLoading(false);
       } else {
-        router.push(redirectTo || '/demo/dashboard');
+        router.push(redirectTo || '/dashboard');
         router.refresh();
       }
     }

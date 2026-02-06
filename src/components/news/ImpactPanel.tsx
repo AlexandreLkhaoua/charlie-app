@@ -15,7 +15,7 @@ const sentimentConfig = {
 export function ImpactPanel({ impact, isLoading }: ImpactPanelProps) {
   if (isLoading || !impact) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="animate-pulse space-y-4">
           <div className="h-4 bg-slate-100 rounded w-1/3"></div>
           <div className="h-3 bg-slate-100 rounded w-full"></div>
@@ -30,7 +30,7 @@ export function ImpactPanel({ impact, isLoading }: ImpactPanelProps) {
   const isPositive = impact.estimated_impact_percent >= 0;
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
       <div className={`p-4 ${config.bg} border-b ${config.border}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -56,12 +56,12 @@ export function ImpactPanel({ impact, isLoading }: ImpactPanelProps) {
       </div>
       
       <div className="p-4 border-b border-slate-100">
-        <h4 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Analysis</h4>
+        <h4 className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Analysis</h4>
         <p className="text-sm text-slate-600 leading-relaxed">{impact.summary}</p>
       </div>
 
       <div className="p-4 border-b border-slate-100">
-        <h4 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Key Points</h4>
+        <h4 className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Key Points</h4>
         <ul className="space-y-2">
           {impact.bullets.map((bullet, index) => (
             <li key={index} className="flex items-start gap-2 text-sm text-slate-600">
@@ -74,7 +74,7 @@ export function ImpactPanel({ impact, isLoading }: ImpactPanelProps) {
 
       {impact.affected_positions.length > 0 && (
         <div className="p-4 border-b border-slate-100">
-          <h4 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">Affected Positions</h4>
+          <h4 className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-3">Affected Positions</h4>
           <div className="space-y-2">
             {impact.affected_positions.map((pos, index) => (
               <div key={index} className="flex items-center justify-between text-sm p-2 bg-slate-50 rounded">
@@ -101,7 +101,7 @@ export function ImpactPanel({ impact, isLoading }: ImpactPanelProps) {
 
       {impact.recommendations.length > 0 && (
         <div className="p-4 bg-slate-50">
-          <h4 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Considerations</h4>
+          <h4 className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">Considerations</h4>
           <ul className="space-y-1.5">
             {impact.recommendations.map((rec, index) => (
               <li key={index} className="text-sm text-slate-600 leading-relaxed">
@@ -109,7 +109,7 @@ export function ImpactPanel({ impact, isLoading }: ImpactPanelProps) {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[11px] text-slate-400">
+          <p className="mt-3 text-[11px] text-slate-500">
             These considerations are for informational purposes only and do not constitute investment advice.
           </p>
         </div>

@@ -29,57 +29,58 @@ export function Topbar() {
   };
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6">
-      {/* Mobile: Logo */}
-      <div className="md:hidden flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center">
-          <span className="text-white font-bold text-xs">PC</span>
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-200">
+      <div className="h-14 px-4 flex items-center justify-between">
+        {/* Mobile: Logo */}
+        <div className="md:hidden flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center">
+            <span className="text-white font-bold text-xs">PC</span>
+          </div>
+          <span className="text-sm font-semibold text-slate-900">Copilot</span>
         </div>
-        <span className="text-sm font-semibold text-slate-900">Copilot</span>
-      </div>
-      
-      {/* Desktop: Empty (title in sidebar) */}
-      <div className="hidden md:block" />
-      
-      <div className="flex items-center gap-3 md:gap-6">
-        <div className="flex items-center gap-2">
-          <label htmlFor="portfolio-select" className="hidden md:block text-sm text-slate-500">
-            Portfolio:
-          </label>
-          <select
-            id="portfolio-select"
-            title="Select portfolio profile"
-            value={profile}
-            onChange={(e) => setProfile(e.target.value as PortfolioProfile)}
-            disabled={isLoading}
-            className="rounded-md border border-slate-300 px-2 md:px-3 py-1.5 text-sm bg-white focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
-          >
-            {Object.entries(profileLabels).map(([key, label]) => (
-              <option key={key} value={key}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
+        
+        {/* Desktop: Empty (title in sidebar) */}
+        <div className="hidden md:block" />
+        
+        <div className="flex items-center gap-3 md:gap-6">
+          <div className="flex items-center gap-2">
+            <label htmlFor="portfolio-select" className="hidden md:block text-sm text-slate-600">
+              Portfolio:
+            </label>
+            <select
+              id="portfolio-select"
+              title="Select portfolio profile"
+              value={profile}
+              onChange={(e) => setProfile(e.target.value as PortfolioProfile)}
+              disabled={isLoading}
+              className="rounded-md border border-slate-200 px-2 md:px-3 py-1.5 text-sm text-slate-900 bg-white focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+            >
+              {Object.entries(profileLabels).map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        {!isAuthenticated && (
-          <span className="hidden md:inline text-[10px] text-slate-400 font-medium uppercase tracking-wide px-2 py-1 bg-slate-100 rounded">
-            Demo
-          </span>
-        )}
+          {!isAuthenticated && (
+            <span className="hidden md:inline text-[10px] text-slate-400 font-medium uppercase tracking-wide px-2 py-1 bg-slate-100 rounded">
+              Demo
+            </span>
+          )}
 
-        {isAuthenticated && userProfile && (
+          {isAuthenticated && userProfile && (
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <button className="flex items-center gap-2 hover:bg-slate-50 rounded-lg px-3 py-1.5 transition-colors">
+              <button className="flex items-center gap-2 hover:bg-slate-100 rounded-lg px-3 py-1.5 transition-colors duration-200">
                 <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center">
-                  <span className="text-slate-700 text-xs font-medium">
+                  <span className="text-slate-900 text-xs font-medium">
                     {userProfile?.displayName && userProfile.displayName.length > 0
                       ? userProfile.displayName.charAt(0).toUpperCase()
                       : '?'}
                   </span>
                 </div>
-                <span className="hidden md:inline text-sm text-slate-700 font-medium">
+                <span className="hidden md:inline text-sm text-slate-900 font-medium">
                   {userEmail || userProfile?.displayName || 'User'}
                 </span>
                 <svg
@@ -124,7 +125,8 @@ export function Topbar() {
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
-        )}
+          )}
+        </div>
       </div>
     </header>
   );

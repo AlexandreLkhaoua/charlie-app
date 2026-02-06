@@ -19,8 +19,8 @@ export function ScenarioCards({ scenarios }: ScenarioCardsProps) {
   ];
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="mb-1 text-xs font-medium text-slate-500 uppercase tracking-wide">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h3 className="mb-1 text-xs font-medium text-slate-600 uppercase tracking-wide">
         Stress Scenarios
       </h3>
       <p className="text-xs text-slate-400 mb-4">
@@ -32,7 +32,7 @@ export function ScenarioCards({ scenarios }: ScenarioCardsProps) {
           return (
             <div
               key={key}
-              className="rounded-lg border border-slate-100 bg-slate-50 p-4"
+              className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 hover:bg-slate-50 transition-colors duration-200"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -43,7 +43,7 @@ export function ScenarioCards({ scenarios }: ScenarioCardsProps) {
                     {scenario.description}
                   </p>
                 </div>
-                <div className="text-right ml-4 flex-shrink-0">
+                <div className="text-right ml-4 shrink-0">
                   <p
                     className={`text-sm font-semibold ${
                       isPositive ? 'text-emerald-600' : 'text-red-600'
@@ -61,7 +61,7 @@ export function ScenarioCards({ scenarios }: ScenarioCardsProps) {
           );
         })}
       </div>
-      <p className="mt-4 text-[11px] text-slate-400 leading-relaxed">
+      <p className="mt-4 text-[11px] text-slate-500 leading-relaxed">
         These projections are based on historical correlations and simplified models. 
         Actual market behavior may differ significantly. This is not investment advice.
       </p>

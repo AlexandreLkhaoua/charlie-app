@@ -14,13 +14,19 @@ import { env } from '../env';
 
 /**
  * Get server-side Supabase client with cookie handling
+ * Uses ANON key with user session (RLS enforced)
  */
 async function getServerClient() {
   const cookieStore = await cookies();
   
+  // Security check: prevent accidental use of service role key
+  if (env.SUPABASE_ANON_KEY.includes('service_role') || env.SUPABASE_ANON_KEY.startsWith('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6') && env.SUPABASE_ANON_KEY.includes('role":"service_role')) {
+    throw new Error('❌ SECURITY: getServerClient must use ANON key, not SERVICE_ROLE key. Check SUPABASE_ANON_KEY env variable.');
+  }
+  
   return createServerClient<Database>(
     env.SUPABASE_URL,
-    env.SUPABASE_SECRET_KEY,
+    env.SUPABASE_ANON_KEY,
     {
       cookies: {
         get(name: string) {
@@ -68,9 +74,9 @@ export async function getProfileOnboardingState(userId: string) {
     }
     
     return {
-      status: ((data as any)?.onboarding_status || 'incomplete') as 'incomplete' | 'complete',
-      completed_at: (data as any)?.onboarding_completed_at || null,
-      login_count: (data as any)?.login_count || 0,
+      status: ((data?.onboarding_status as string) || 'incomplete') as 'incomplete' | 'complete',
+      completed_at: (data?.onboarding_completed_at as string | null) || null,
+      login_count: (data?.login_count as number) || 0,
     };
   } catch (error) {
     console.error('[Onboarding] Unexpected error:', error);
@@ -99,7 +105,7 @@ export async function completeOnboarding(
     
     // Start transaction-like logic
     // 1. Upsert onboarding response (handles UNIQUE constraint on user_id+version)
-    const { error: upsertError } = await (supabase as any)
+    const { error: upsertError } = await supabase
       .from('onboarding_responses')
       .upsert(
         {
@@ -119,7 +125,7 @@ export async function completeOnboarding(
     }
     
     // 2. Update profile status (RLS ensures user can only update their own profile)
-    const { error: updateError } = await (supabase as any)
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({
         onboarding_status: 'complete',

@@ -49,15 +49,15 @@ export function NewsList({ news, selectedId, onSelect }: NewsListProps) {
             <h3 className="text-sm font-medium text-slate-900 line-clamp-2">
               {item.title}
             </h3>
-            <span className="text-[10px] text-slate-400 whitespace-nowrap uppercase tracking-wide">
+            <span className="text-[10px] text-slate-500 whitespace-nowrap uppercase tracking-wide">
               {formatDate(item.published_at)}
             </span>
           </div>
-          <p className="mt-1.5 text-xs text-slate-500 line-clamp-2 leading-relaxed">
+          <p className="mt-1.5 text-xs text-slate-600 line-clamp-2 leading-relaxed">
             {item.summary}
           </p>
           <div className="mt-2 flex items-center gap-2">
-            <span className="text-[10px] text-slate-400 uppercase">{item.source}</span>
+            <span className="text-[10px] text-slate-500 uppercase">{item.source}</span>
             <span className="text-slate-200">|</span>
             <div className="flex gap-1">
               {item.tags.slice(0, 2).map((tag) => (

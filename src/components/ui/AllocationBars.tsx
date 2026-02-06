@@ -35,8 +35,8 @@ export function AllocationBars({
   );
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="mb-4 text-xs font-medium text-slate-500 uppercase tracking-wide">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h3 className="mb-4 text-xs font-medium text-slate-600 uppercase tracking-wide">
         {title}
       </h3>
       <div className="space-y-3">
@@ -47,7 +47,7 @@ export function AllocationBars({
               <span className="font-medium text-slate-900">
                 {allocation.weight_percent.toFixed(1)}%
                 {showValues && (
-                  <span className="ml-2 text-slate-400 text-xs">
+                  <span className="ml-2 text-slate-500 text-xs">
                     €{allocation.value_eur.toLocaleString()}
                   </span>
                 )}

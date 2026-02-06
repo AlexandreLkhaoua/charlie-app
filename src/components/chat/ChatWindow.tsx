@@ -28,7 +28,7 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
           <h3 className="text-base font-medium text-slate-900 mb-2">
             Wealth Management Copilot
           </h3>
-          <p className="text-sm text-slate-500 leading-relaxed">
+          <p className="text-sm text-slate-600 leading-relaxed">
             Ask questions about your portfolio composition, risk exposure, or market conditions. Responses are personalized to your actual holdings.
           </p>
         </div>
@@ -82,7 +82,7 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
                 )}
                 {message.legacyStructured.actions && message.legacyStructured.actions.length > 0 && (
                   <div className="mt-3 pt-2 border-t border-slate-200">
-                    <p className="text-xs font-medium text-slate-500 mb-1 uppercase tracking-wide">Considerations</p>
+                    <p className="text-xs font-medium text-slate-600 mb-1 uppercase tracking-wide">Considerations</p>
                     {message.legacyStructured.actions.map((action, idx) => (
                       <p key={idx} className="text-xs text-slate-600">{action}</p>
                     ))}

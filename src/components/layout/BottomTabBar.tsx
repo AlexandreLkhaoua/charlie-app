@@ -63,7 +63,7 @@ export function BottomTabBar() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors duration-200 ${
                 isActive
                   ? 'text-slate-900'
                   : 'text-slate-400 hover:text-slate-600'

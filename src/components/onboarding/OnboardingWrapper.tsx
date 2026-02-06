@@ -1,7 +1,7 @@
 /**
  * OnboardingWrapper Component
  * ----------------------------
- * Client wrapper that mounts the OnboardingModal once per session.
+ * Client wrapper that mounts the OnboardingModal and OnboardingBanner.
  * Handles login count increment and user detection.
  * Only activates on non-demo pages.
  */
@@ -11,6 +11,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { OnboardingModal } from './OnboardingModal';
+import { OnboardingBanner } from './OnboardingBanner';
 import { incrementLoginCount } from '@/lib/supabase/actions';
 import { createClient } from '@/lib/supabase/client';
 
@@ -18,15 +19,15 @@ const LOGIN_TRACKED_KEY = 'charlie_login_tracked';
 
 export function OnboardingWrapper() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const pathname = usePathname();
   const supabase = createClient();
 
-  // Don't show on demo pages, login, signup, or landing
+  // Don't show on demo pages, auth, or landing
   const shouldShow =
     pathname &&
     !pathname.startsWith('/demo') &&
-    !pathname.startsWith('/login') &&
-    !pathname.startsWith('/signup') &&
+    !pathname.startsWith('/auth') &&
     pathname !== '/';
 
   useEffect(() => {
@@ -53,5 +54,17 @@ export function OnboardingWrapper() {
 
   if (!shouldShow || !userId) return null;
 
-  return <OnboardingModal userId={userId} />;
+  return (
+    <>
+      <OnboardingBanner 
+        userId={userId} 
+        onStartOnboarding={() => setShowModal(true)} 
+      />
+      <OnboardingModal 
+        userId={userId} 
+        forceShow={showModal}
+        onClose={() => setShowModal(false)}
+      />
+    </>
+  );
 }

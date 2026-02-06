@@ -35,14 +35,14 @@ export function NewsDetail({
   const displaySummary = translatedContent || news.summary;
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
       <div className="p-5 border-b border-slate-200">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-slate-900">
               {news.title}
             </h2>
-            <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+            <div className="mt-2 flex items-center gap-2 text-xs text-slate-600">
               <span className="font-medium">{news.source}</span>
               {news.author && (
                 <>
@@ -86,7 +86,7 @@ export function NewsDetail({
       
       <div className="p-5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wide">Summary</h3>
+          <h3 className="text-xs font-medium text-slate-600 uppercase tracking-wide">Summary</h3>
           <button
             onClick={onToggleLanguage}
             disabled={isTranslating}

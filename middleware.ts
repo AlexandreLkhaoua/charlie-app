@@ -5,8 +5,8 @@
  * 
  * This middleware:
  * 1. Refreshes Supabase auth tokens from cookies
- * 2. Redirects unauthenticated users from protected routes to /login
- * 3. Redirects authenticated users from auth pages to /demo/dashboard
+ * 2. Redirects unauthenticated users from protected routes to /auth
+ * 3. Redirects authenticated users from auth pages to /dashboard
  */
 
 import { createServerClient } from '@supabase/ssr';
@@ -49,15 +49,18 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protected routes - require authentication
-  if (!user && request.nextUrl.pathname.startsWith('/demo')) {
-    const redirectUrl = new URL('/login', request.url);
+  const protectedRoutes = ['/dashboard', '/portfolio', '/news', '/risks', '/chat', '/scenarios', '/tools', '/profile'];
+  const isProtectedRoute = protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route));
+  
+  if (!user && isProtectedRoute) {
+    const redirectUrl = new URL('/auth', request.url);
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
   // Auth routes - redirect if already logged in
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
-    return NextResponse.redirect(new URL('/demo/dashboard', request.url));
+  if (user && request.nextUrl.pathname === '/auth') {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return response;

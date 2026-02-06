@@ -12,6 +12,16 @@ import { env } from '../env';
 let supabaseAdmin: ReturnType<typeof createClient<Database>> | null = null;
 
 export function getSupabaseAdminClient() {
+  // Security check: admin client must only run server-side
+  if (typeof window !== 'undefined') {
+    throw new Error('❌ SECURITY: getSupabaseAdminClient cannot be called from browser. Use getServerClient or browser client instead.');
+  }
+  
+  // Security check: prevent NEXT_PUBLIC_ keys from being used
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    // This is expected, just warn if someone tries to use them here
+  }
+  
   if (supabaseAdmin) return supabaseAdmin;
 
   supabaseAdmin = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY, {

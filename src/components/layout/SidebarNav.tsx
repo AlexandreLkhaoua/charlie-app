@@ -31,11 +31,11 @@ export function SidebarNav() {
   const displayName = profile?.displayName || 'Demo User';
 
   return (
-    <aside className="w-64 bg-slate-900 text-white flex flex-col">
-      <div className="p-6 border-b border-slate-800">
+    <aside className="w-64 shrink-0 bg-slate-950 text-slate-100 sticky top-0 h-[100dvh] border-r border-white/10 overflow-y-auto flex flex-col">
+      <div className="p-6 border-b border-white/10">
         <Link href="/" className="block">
-          <span className="text-xl font-semibold tracking-tight">Charlie</span>
-          <span className="block text-xs text-slate-400 mt-1">AI Wealth Management</span>
+          <span className="text-xl font-semibold tracking-tight text-white">Charlie</span>
+          <span className="block text-xs text-slate-400 mt-1 opacity-80">AI Wealth Management</span>
         </Link>
       </div>
       <nav className="flex-1 p-4">
@@ -46,10 +46,10 @@ export function SidebarNav() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-white/5 hover:text-white transition-colors duration-200 ${
                     isActive
-                      ? 'bg-slate-800 text-white'
-                      : 'text-slate-300 hover:bg-slate-800/50 hover:text-white'
+                      ? 'bg-white/10 text-white ring-1 ring-white/10'
+                      : ''
                   }`}
                 >
                   {item.label}
@@ -59,14 +59,14 @@ export function SidebarNav() {
           })}
         </ul>
       </nav>
-      <div className="p-4 border-t border-slate-800">
-        <Link href="/demo/profile" className="flex items-center gap-3 hover:bg-slate-800/50 rounded-lg p-2 -m-2 transition-colors">
-          <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center text-sm font-medium">
+      <div className="p-4 border-t border-white/10">
+        <Link href="/demo/profile" className="flex items-center gap-3 hover:bg-white/5 rounded-lg p-2 -m-2 transition-colors">
+          <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium text-white">
             {getInitials()}
           </div>
           <div>
-            <p className="text-sm font-medium">{displayName}</p>
-            <p className="text-xs text-slate-400">View profile</p>
+            <p className="text-sm font-medium text-white">{displayName}</p>
+            <p className="text-xs text-slate-400 opacity-80">View profile</p>
           </div>
         </Link>
       </div>

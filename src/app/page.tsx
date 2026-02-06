@@ -72,7 +72,7 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-4">
             <Link
-              href="/login"
+              href="/auth"
               className="text-sm text-slate-400 hover:text-white transition-colors"
             >
               Login
@@ -101,7 +101,7 @@ export default function HomePage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
             <Link
-              href="/signup"
+              href="/auth"
               className="inline-flex items-center justify-center px-8 py-3.5 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition-colors"
             >
               Get Started

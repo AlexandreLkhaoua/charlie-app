@@ -14,12 +14,12 @@ export function PositionsTable({
   const displayPositions = positions.slice(0, maxRows);
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-slate-200">
-        <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+        <h3 className="text-xs font-medium text-slate-600 uppercase tracking-wide">
           Holdings
         </h3>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Showing {Math.min(maxRows, positions.length)} of {positions.length} positions
         </p>
       </div>
@@ -48,13 +48,13 @@ export function PositionsTable({
           </thead>
           <tbody className="bg-white divide-y divide-slate-100">
             {displayPositions.map((position) => (
-              <tr key={position.id} className="hover:bg-slate-50 transition-colors">
+              <tr key={position.id} className="hover:bg-slate-50 transition-colors duration-200">
                 <td className="px-4 py-3 whitespace-nowrap">
                   <div>
                     <div className="text-sm font-medium text-slate-900">
                       {position.ticker}
                     </div>
-                    <div className="text-xs text-slate-400 truncate max-w-[200px]">
+                    <div className="text-xs text-slate-500 truncate max-w-50">
                       {position.name}
                     </div>
                   </div>
