@@ -57,18 +57,20 @@ describe('OnboardingModal', () => {
   it('should not show modal immediately', () => {
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'incomplete',
+      completed_at: null,
       login_count: 1,
     });
 
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     // Modal should not be visible immediately (before query resolves)
-    expect(screen.queryByText('Bienvenue sur Charlie')).not.toBeInTheDocument();
+    expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
   });
 
   it('should render when state allows showing modal', async () => {
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'incomplete',
+      completed_at: null,
       login_count: 1,
     });
 
@@ -76,13 +78,14 @@ describe('OnboardingModal', () => {
 
     // Wait for modal to appear
     await waitFor(() => {
-      expect(screen.getByText('Bienvenue sur Charlie')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
     });
   });
 
   it('should not show modal if onboarding is complete and not reminder time', async () => {
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'complete',
+      completed_at: new Date().toISOString(),
       login_count: 3, // Not divisible by 2
     });
 
@@ -92,12 +95,13 @@ describe('OnboardingModal', () => {
     await new Promise(resolve => setTimeout(resolve, 50));
 
     // Modal should not appear
-    expect(screen.queryByText('Bienvenue sur Charlie')).not.toBeInTheDocument();
+    expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
   });
 
   it('should show reminder every 2 logins', async () => {
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'complete',
+      completed_at: new Date().toISOString(),
       login_count: 4, // Divisible by 2 = reminder
     });
 
@@ -105,7 +109,7 @@ describe('OnboardingModal', () => {
 
     // Wait for modal to appear
     await waitFor(() => {
-      expect(screen.getByText('Bienvenue sur Charlie')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
     });
   });
 
@@ -116,6 +120,7 @@ describe('OnboardingModal', () => {
 
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'incomplete',
+      completed_at: null,
       login_count: 1,
     });
 
@@ -125,12 +130,13 @@ describe('OnboardingModal', () => {
     await new Promise(resolve => setTimeout(resolve, 50));
 
     // Modal should not appear because it's snoozed
-    expect(screen.queryByText('Bienvenue sur Charlie')).not.toBeInTheDocument();
+    expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
   });
 
   it('should show all 3 questions', async () => {
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'incomplete',
+      completed_at: null,
       login_count: 1,
     });
 
@@ -138,7 +144,7 @@ describe('OnboardingModal', () => {
 
     // Wait for modal
     await waitFor(() => {
-      expect(screen.getByText('Bienvenue sur Charlie')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
     });
 
     // Check all questions are present
@@ -150,16 +156,17 @@ describe('OnboardingModal', () => {
   it('should disable submit button until all questions answered', async () => {
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'incomplete',
+      completed_at: null,
       login_count: 1,
     });
 
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Bienvenue sur Charlie')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole('button', { name: /Continuer/i });
+    const submitButton = screen.getByRole('button', { name: /Continue/i });
     expect(submitButton).toBeDisabled();
   });
 
@@ -168,22 +175,23 @@ describe('OnboardingModal', () => {
 
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'incomplete',
+      completed_at: null,
       login_count: 1,
     });
 
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Bienvenue sur Charlie')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
     });
 
     // Answer all questions
-    await user.click(screen.getByRole('button', { name: /Croissance/i }));
-    await user.click(screen.getByRole('button', { name: /1–3 ans/i }));
-    await user.click(screen.getByRole('button', { name: /J'attends/i }));
+    await user.click(screen.getByRole('button', { name: /Growth/i }));
+    await user.click(screen.getByRole('button', { name: /1–3 years/i }));
+    await user.click(screen.getByRole('button', { name: /I wait/i }));
 
     // Submit button should now be enabled
-    const submitButton = screen.getByRole('button', { name: /Continuer/i });
+    const submitButton = screen.getByRole('button', { name: /Continue/i });
     expect(submitButton).toBeEnabled();
   });
 
@@ -192,27 +200,27 @@ describe('OnboardingModal', () => {
 
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'incomplete',
+      completed_at: null,
       login_count: 1,
     });
 
     vi.mocked(supabaseActions.completeOnboarding).mockResolvedValue({
       success: true,
-      data: { id: 'response-123' },
     });
 
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Bienvenue sur Charlie')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
     });
 
     // Answer all questions
-    await user.click(screen.getByRole('button', { name: /Croissance/i }));
-    await user.click(screen.getByRole('button', { name: /1–3 ans/i }));
-    await user.click(screen.getByRole('button', { name: /J'attends/i }));
+    await user.click(screen.getByRole('button', { name: /Growth/i }));
+    await user.click(screen.getByRole('button', { name: /1–3 years/i }));
+    await user.click(screen.getByRole('button', { name: /I wait/i }));
 
     // Submit
-    const submitButton = screen.getByRole('button', { name: /Continuer/i });
+    const submitButton = screen.getByRole('button', { name: /Continue/i });
     await user.click(submitButton);
 
     // Check mutation was called
@@ -226,33 +234,34 @@ describe('OnboardingModal', () => {
 
     // Modal should close
     await waitFor(() => {
-      expect(screen.queryByText('Bienvenue sur Charlie')).not.toBeInTheDocument();
+      expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
     });
   });
 
-  it('should set snooze when clicking "Plus tard"', async () => {
+  it('should set snooze when clicking "Later"', async () => {
     const user = userEvent.setup();
 
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'incomplete',
+      completed_at: null,
       login_count: 1,
     });
 
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Bienvenue sur Charlie')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
     });
 
     // Click snooze button
-    const snoozeButton = screen.getByRole('button', { name: /Plus tard/i });
+    const snoozeButton = screen.getByRole('button', { name: /Later/i });
     await user.click(snoozeButton);
 
     // Check localStorage was set
     const snoozeValue = localStorageMock['charlie_onboarding_snooze_until'];
     expect(snoozeValue).toBeDefined();
     
-    const snoozeDate = new Date(snoozeValue);
+    const snoozeDate = new Date(snoozeValue!);
     const expectedDate = new Date();
     expectedDate.setDate(expectedDate.getDate() + 7);
     
@@ -262,7 +271,7 @@ describe('OnboardingModal', () => {
 
     // Modal should close
     await waitFor(() => {
-      expect(screen.queryByText('Bienvenue sur Charlie')).not.toBeInTheDocument();
+      expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
     });
   });
 
@@ -271,22 +280,23 @@ describe('OnboardingModal', () => {
 
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
       status: 'incomplete',
+      completed_at: null,
       login_count: 1,
     });
 
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Bienvenue sur Charlie')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
     });
 
     // Click X button
-    const closeButton = screen.getByLabelText(/Fermer/i);
+    const closeButton = screen.getByLabelText(/Close/i);
     await user.click(closeButton);
 
     // Modal should close
     await waitFor(() => {
-      expect(screen.queryByText('Bienvenue sur Charlie')).not.toBeInTheDocument();
+      expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
     });
   });
 });

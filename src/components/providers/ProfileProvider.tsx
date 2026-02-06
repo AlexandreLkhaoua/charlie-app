@@ -147,7 +147,6 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
       const { error } = await supabase
         .from('profiles')
-        // @ts-expect-error - Supabase type inference issue
         .update(dbUpdates)
         .eq('id', user.id);
 
@@ -192,7 +191,6 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
       const { error } = await supabase
         .from('profiles')
-        // @ts-expect-error - Supabase type inference issue
         .update(defaultValues)
         .eq('id', user.id);
 

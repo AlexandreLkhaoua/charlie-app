@@ -64,6 +64,7 @@
     "eslint-config-next": "^15.1.0",
     "jsdom": "^27.3.0",
     "postcss": "^8.4.49",
+    "supabase": "^2.75.5",
     "tailwindcss": "^4.0.0-beta.8",
     "typescript": "^5.7.2",
     "vitest": "^4.0.16"

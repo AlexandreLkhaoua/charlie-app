@@ -12,181 +12,175 @@ import type { Database } from './database';
 import { onboardingAnswersSchema } from '../validation/schemas';
 import { env } from '../env';
 
-/**
- * Get server-side Supabase client with cookie handling
- * Uses ANON key with user session (RLS enforced)
- */
+/* -------------------------------------------------------------------------- */
+/*                                    Types                                   */
+/* -------------------------------------------------------------------------- */
+
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
+
+type ProfileStateSelect = Pick<
+  ProfileRow,
+  'onboarding_status' | 'onboarding_completed_at' | 'login_count'
+>;
+
+type OnboardingResponseInsert =
+  Database['public']['Tables']['onboarding_responses']['Insert'];
+
+type IncrementLoginArgs =
+  Database['public']['Functions']['increment_login_count']['Args'];
+
+/* -------------------------------------------------------------------------- */
+/*                               Supabase Client                               */
+/* -------------------------------------------------------------------------- */
+
 async function getServerClient() {
   const cookieStore = await cookies();
-  
-  // Security check: prevent accidental use of service role key
-  if (env.SUPABASE_ANON_KEY.includes('service_role') || env.SUPABASE_ANON_KEY.startsWith('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6') && env.SUPABASE_ANON_KEY.includes('role":"service_role')) {
-    throw new Error('❌ SECURITY: getServerClient must use ANON key, not SERVICE_ROLE key. Check SUPABASE_ANON_KEY env variable.');
+  const key = env.SUPABASE_ANON_KEY;
+
+  const looksLikeServiceRole =
+    key.includes('service_role') ||
+    (key.startsWith('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.') &&
+      key.includes('"role":"service_role"'));
+
+  if (looksLikeServiceRole) {
+    throw new Error(
+      'SECURITY: getServerClient must use ANON key, not SERVICE_ROLE'
+    );
   }
-  
-  return createServerClient<Database>(
-    env.SUPABASE_URL,
-    env.SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options) {
-          try {
-            cookieStore.set(name, value, options);
-          } catch {
-            // Cookie cannot be set in server actions
-          }
-        },
-        remove(name: string, options) {
-          try {
-            cookieStore.delete(name);
-          } catch {
-            // Cookie cannot be removed in server actions
-          }
-        },
+
+  return createServerClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+    cookies: {
+      get: (name) => cookieStore.get(name)?.value,
+      set: (name, value, options) => {
+        try {
+          cookieStore.set(name, value, options);
+        } catch {}
       },
-    }
-  );
+      remove: (name) => {
+        try {
+          cookieStore.delete(name);
+        } catch {}
+      },
+    },
+  });
 }
 
-/**
- * Get profile onboarding state
- */
+/* -------------------------------------------------------------------------- */
+/*                           Onboarding – Read state                           */
+/* -------------------------------------------------------------------------- */
+
 export async function getProfileOnboardingState(userId: string) {
   try {
     const supabase = await getServerClient();
-    
+
     const { data, error } = await supabase
       .from('profiles')
       .select('onboarding_status, onboarding_completed_at, login_count')
       .eq('id', userId)
-      .single();
-    
-    if (error) {
-      console.error('[Onboarding] Error fetching profile state:', error);
-      return { 
-        status: 'incomplete' as const, 
+      .returns<ProfileStateSelect[]>()
+      .maybeSingle();
+
+    if (error || !data) {
+      return {
+        status: 'incomplete' as const,
         completed_at: null,
         login_count: 0,
       };
     }
-    
+
     return {
-      status: ((data?.onboarding_status as string) || 'incomplete') as 'incomplete' | 'complete',
-      completed_at: (data?.onboarding_completed_at as string | null) || null,
-      login_count: (data?.login_count as number) || 0,
+      status: (data.onboarding_status ?? 'incomplete') as
+        | 'incomplete'
+        | 'complete',
+      completed_at: data.onboarding_completed_at ?? null,
+      login_count: data.login_count ?? 0,
     };
-  } catch (error) {
-    console.error('[Onboarding] Unexpected error:', error);
-    return { 
-      status: 'incomplete' as const, 
+  } catch {
+    return {
+      status: 'incomplete' as const,
       completed_at: null,
       login_count: 0,
     };
   }
 }
 
-/**
- * Complete onboarding - upsert response and update profile
- * Note: DB has UNIQUE constraint on (user_id, version) to prevent duplicates
- * and CHECK constraint to validate JSON keys (goal, horizon, drawdown_reaction)
- */
-export async function completeOnboarding(
-  userId: string,
-  answers: unknown
-) {
+/* -------------------------------------------------------------------------- */
+/*                          Onboarding – Complete flow                         */
+/* -------------------------------------------------------------------------- */
+
+export async function completeOnboarding(userId: string, answers: unknown) {
   try {
-    // Validate answers
     const validatedAnswers = onboardingAnswersSchema.parse(answers);
-    
     const supabase = await getServerClient();
-    
-    // Start transaction-like logic
-    // 1. Upsert onboarding response (handles UNIQUE constraint on user_id+version)
+
+    const payload: OnboardingResponseInsert = {
+      user_id: userId,
+      version: 'v1_light',
+      answers: validatedAnswers as OnboardingResponseInsert['answers'],
+    };
+
     const { error: upsertError } = await supabase
       .from('onboarding_responses')
-      .upsert(
-        {
-          user_id: userId,
-          version: 'v1_light',
-          answers: validatedAnswers,
-        },
-        { 
-          onConflict: 'user_id,version',
-          ignoreDuplicates: false, // Update existing row
-        }
-      );
-    
+      .upsert([payload], { onConflict: 'user_id,version' });
+
     if (upsertError) {
-      console.error('[Onboarding] Error upserting response:', upsertError);
       return { success: false, error: 'Failed to save onboarding response' };
     }
-    
-    // 2. Update profile status (RLS ensures user can only update their own profile)
+
+    const now = new Date().toISOString();
+
+    const update: ProfileUpdate = {
+      onboarding_status: 'complete',
+      onboarding_completed_at: now,
+      updated_at: now,
+    };
+
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({
-        onboarding_status: 'complete',
-        onboarding_completed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
+      .update(update)
       .eq('id', userId);
-    
+
     if (updateError) {
-      console.error('[Onboarding] Error updating profile:', updateError);
       return { success: false, error: 'Failed to update profile' };
     }
-    
+
     return { success: true };
-  } catch (error) {
-    console.error('[Onboarding] Validation or unexpected error:', error);
+  } catch {
     return { success: false, error: 'Invalid onboarding data' };
   }
 }
 
-/**
- * Increment login count for a user
- * Note: DB function is SECURITY INVOKER, so it runs with user's RLS context
- * and explicitly checks auth.uid() === p_user_id to prevent abuse
- */
+/* -------------------------------------------------------------------------- */
+/*                            Auth – Login counter                             */
+/* -------------------------------------------------------------------------- */
+
 export async function incrementLoginCount(userId: string) {
   try {
     const supabase = await getServerClient();
-    
-    // Call the database function (SECURITY INVOKER + auth check inside)
-    const { error } = await (supabase as any).rpc('increment_login_count', {
-      p_user_id: userId,
-    });
-    
-    if (error) {
-      console.error('[Auth] Error incrementing login count:', error);
-      return { success: false };
-    }
-    
+
+    const args: IncrementLoginArgs = { user_id_param: userId };
+    const { error } = await supabase.rpc('increment_login_count', args);
+
+    if (error) return { success: false };
     return { success: true };
-  } catch (error) {
-    console.error('[Auth] Unexpected error incrementing login count:', error);
+  } catch {
     return { success: false };
   }
 }
 
-/**
- * Get current user from session
- */
+/* -------------------------------------------------------------------------- */
+/*                              Auth – Current user                            */
+/* -------------------------------------------------------------------------- */
+
 export async function getCurrentUser() {
   try {
     const supabase = await getServerClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
-    if (error || !user) {
-      return null;
-    }
-    
-    return user;
-  } catch (error) {
-    console.error('[Auth] Error getting current user:', error);
+    const { data, error } = await supabase.auth.getUser();
+
+    if (error || !data.user) return null;
+    return data.user;
+  } catch {
     return null;
   }
 }
