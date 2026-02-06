@@ -7,6 +7,7 @@ Accuracy and technical correctness have priority over politeness.
 
 ## Mandatory rules
 - Never create, modify, or propose a `.md` file unless the user explicitly asks for it.
+- Ne jamais proposer de créer un fichier README sans demande explicite.
 - Never introduce new files by default; only modify existing files when explicitly requested.
 - If a file creation seems necessary, explain why and ask for confirmation first.
 

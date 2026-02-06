@@ -19,6 +19,10 @@ export type Database = {
           answer_style: string | null;
           content_priority: string | null;
           avoid_jargon: boolean | null;
+          onboarding_status: string | null;
+          onboarding_completed_at: string | null;
+          login_count: number | null;
+          last_login_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -33,6 +37,10 @@ export type Database = {
           answer_style?: string | null;
           content_priority?: string | null;
           avoid_jargon?: boolean | null;
+          onboarding_status?: string | null;
+          onboarding_completed_at?: string | null;
+          login_count?: number | null;
+          last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -47,6 +55,10 @@ export type Database = {
           answer_style?: string | null;
           content_priority?: string | null;
           avoid_jargon?: boolean | null;
+          onboarding_status?: string | null;
+          onboarding_completed_at?: string | null;
+          login_count?: number | null;
+          last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -168,6 +180,41 @@ export type Database = {
           created_at?: string;
         };
       };
+      onboarding_responses: {
+        Row: {
+          id: string;
+          user_id: string;
+          version: string;
+          answers: {
+            goal?: string;
+            horizon?: string;
+            drawdown_reaction?: string;
+          };
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          version?: string;
+          answers: {
+            goal?: string;
+            horizon?: string;
+            drawdown_reaction?: string;
+          };
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          version?: string;
+          answers?: {
+            goal?: string;
+            horizon?: string;
+            drawdown_reaction?: string;
+          };
+          created_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -194,6 +241,10 @@ export type Database = {
           p_content_hash: string;
         };
         Returns: string;
+      };
+      increment_login_count: {
+        Args: { p_user_id: string };
+        Returns: void;
       };
     };
     Enums: Record<string, never>;

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryProvider } from '@/components/providers/QueryProvider';
+import { OnboardingWrapper } from '@/components/onboarding';
 import './globals.css';
 
 // Optimized font loading with next/font
@@ -69,6 +70,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background font-sans antialiased">
         <QueryProvider>
           <TooltipProvider delayDuration={300}>
+            <OnboardingWrapper />
             {children}
           </TooltipProvider>
         </QueryProvider>

@@ -72,6 +72,28 @@ export const copilotResponseSchema = z.object({
 export type CopilotResponse = z.infer<typeof copilotResponseSchema>;
 
 // ============================================
+// Onboarding Schemas
+// ============================================
+
+export const onboardingAnswersSchema = z.object({
+  goal: z.enum(['growth', 'income', 'preservation']).describe('Objectif principal d\'investissement'),
+  horizon: z.enum(['<1year', '1-3years', '3-7years', '7+years']).describe('Horizon de placement'),
+  drawdown_reaction: z.enum(['sell', 'wait', 'buy']).describe('Réaction face à une baisse de -20%'),
+});
+
+export type OnboardingAnswers = z.infer<typeof onboardingAnswersSchema>;
+
+export const onboardingResponseSchema = z.object({
+  id: z.string().uuid(),
+  user_id: z.string().uuid(),
+  version: z.string(),
+  answers: onboardingAnswersSchema,
+  created_at: z.coerce.date(),
+});
+
+export type OnboardingResponse = z.infer<typeof onboardingResponseSchema>;
+
+// ============================================
 // Chat Message Schemas
 // ============================================
 
