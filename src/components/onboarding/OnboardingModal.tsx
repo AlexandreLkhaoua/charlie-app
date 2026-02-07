@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -32,6 +32,7 @@ export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: Onbo
   const [isVisible, setIsVisible] = useState(false);
   const [answers, setAnswers] = useState<Partial<OnboardingAnswers>>({});
   const [showSuccess, setShowSuccess] = useState(false);
+  const queryClient = useQueryClient();
 
   // Fetch onboarding state
   const { data: onboardingState } = useQuery({
@@ -45,6 +46,8 @@ export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: Onbo
     mutationFn: (answers: OnboardingAnswers) => completeOnboarding(userId, answers),
     onSuccess: (result) => {
       if (result.success) {
+        // Invalidate query to update banner and other components
+        queryClient.invalidateQueries({ queryKey: ['onboarding-state', userId] });
         setShowSuccess(true);
         // Close after showing success message
         setTimeout(() => {
@@ -115,7 +118,7 @@ export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: Onbo
               All done!
             </h2>
             <p className="text-muted-foreground">
-              Let's dig into your invests
+              Let&apos;s dig into your invests
             </p>
           </div>
         </Card>

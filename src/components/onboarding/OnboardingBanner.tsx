@@ -7,8 +7,9 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { getProfileOnboardingState } from '@/lib/supabase/actions';
 
 interface OnboardingBannerProps {
@@ -19,49 +20,33 @@ interface OnboardingBannerProps {
 const BANNER_DISMISSED_KEY = 'charlie_onboarding_banner_dismissed';
 
 export function OnboardingBanner({ userId, onStartOnboarding }: OnboardingBannerProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(() => {
+    // Check if banner was dismissed this session
+    return typeof window !== 'undefined' && sessionStorage.getItem(BANNER_DISMISSED_KEY) === 'true';
+  });
 
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      console.log('[Banner] Checking onboarding for user:', userId);
-      
-      // Check if banner was dismissed this session
-      const dismissed = sessionStorage.getItem(BANNER_DISMISSED_KEY);
-      if (dismissed) {
-        console.log('[Banner] Banner was dismissed');
-        setIsDismissed(true);
-        return;
-      }
+  // Fetch onboarding state using React Query (will sync with modal)
+  const { data: onboardingState } = useQuery({
+    queryKey: ['onboarding-state', userId],
+    queryFn: () => getProfileOnboardingState(userId),
+    enabled: !!userId,
+  });
 
-      // Check onboarding status
-      const state = await getProfileOnboardingState(userId);
-      console.log('[Banner] Onboarding state:', state);
-      
-      // Show banner only if onboarding is incomplete
-      if (state.status === 'incomplete') {
-        console.log('[Banner] Showing banner');
-        setIsVisible(true);
-      } else {
-        console.log('[Banner] Onboarding complete, not showing banner');
-      }
-    };
-
-    checkOnboardingStatus();
-  }, [userId]);
+  // Determine if banner should be visible
+  const shouldShowBanner = 
+    onboardingState?.status === 'incomplete' && 
+    !isDismissed;
 
   const handleDismiss = () => {
     sessionStorage.setItem(BANNER_DISMISSED_KEY, 'true');
     setIsDismissed(true);
-    setIsVisible(false);
   };
 
   const handleStartOnboarding = () => {
-    setIsVisible(false);
     onStartOnboarding();
   };
 
-  if (!isVisible || isDismissed) return null;
+  if (!shouldShowBanner) return null;
 
   return (
     <div className="bg-linear-to-r from-blue-600 to-indigo-600 text-white">
