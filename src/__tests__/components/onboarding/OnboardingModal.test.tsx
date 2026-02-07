@@ -64,7 +64,7 @@ describe('OnboardingModal', () => {
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     // Modal should not be visible immediately (before query resolves)
-    expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('onboarding-modal')).not.toBeInTheDocument();
   });
 
   it('should render when state allows showing modal', async () => {
@@ -78,7 +78,7 @@ describe('OnboardingModal', () => {
 
     // Wait for modal to appear
     await waitFor(() => {
-      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
+      expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
     });
   });
 
@@ -95,7 +95,7 @@ describe('OnboardingModal', () => {
     await new Promise(resolve => setTimeout(resolve, 50));
 
     // Modal should not appear
-    expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('onboarding-modal')).not.toBeInTheDocument();
   });
 
   it('should show reminder every 2 logins', async () => {
@@ -109,28 +109,8 @@ describe('OnboardingModal', () => {
 
     // Wait for modal to appear
     await waitFor(() => {
-      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
+      expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
     });
-  });
-
-  it('should not show modal if snoozed', async () => {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 7);
-    localStorageMock['charlie_onboarding_snooze_until'] = futureDate.toISOString();
-
-    vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
-      status: 'incomplete',
-      completed_at: null,
-      login_count: 1,
-    });
-
-    render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
-
-    // Wait a bit
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    // Modal should not appear because it's snoozed
-    expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
   });
 
   it('should show all 3 questions', async () => {
@@ -144,7 +124,7 @@ describe('OnboardingModal', () => {
 
     // Wait for modal
     await waitFor(() => {
-      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
+      expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
     });
 
     // Check all questions are present
@@ -163,10 +143,10 @@ describe('OnboardingModal', () => {
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
+      expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
     });
 
-    const submitButton = screen.getByRole('button', { name: /Continue/i });
+    const submitButton = screen.getByTestId('onboarding-submit');
     expect(submitButton).toBeDisabled();
   });
 
@@ -182,7 +162,7 @@ describe('OnboardingModal', () => {
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
+      expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
     });
 
     // Answer all questions
@@ -191,7 +171,7 @@ describe('OnboardingModal', () => {
     await user.click(screen.getByRole('button', { name: /I wait/i }));
 
     // Submit button should now be enabled
-    const submitButton = screen.getByRole('button', { name: /Continue/i });
+    const submitButton = screen.getByTestId('onboarding-submit');
     expect(submitButton).toBeEnabled();
   });
 
@@ -211,7 +191,7 @@ describe('OnboardingModal', () => {
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
+      expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
     });
 
     // Answer all questions
@@ -220,7 +200,7 @@ describe('OnboardingModal', () => {
     await user.click(screen.getByRole('button', { name: /I wait/i }));
 
     // Submit
-    const submitButton = screen.getByRole('button', { name: /Continue/i });
+    const submitButton = screen.getByTestId('onboarding-submit');
     await user.click(submitButton);
 
     // Check mutation was called
@@ -232,13 +212,21 @@ describe('OnboardingModal', () => {
       });
     });
 
-    // Modal should close
+    // Should show success message
     await waitFor(() => {
-      expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
+      expect(screen.getByTestId('onboarding-success')).toBeInTheDocument();
     });
+
+    // Modal should close after timeout (2 seconds)
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId('onboarding-success')).not.toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
   });
 
-  it('should set snooze when clicking "Later"', async () => {
+  it('should close modal when clicking "Later"', async () => {
     const user = userEvent.setup();
 
     vi.mocked(supabaseActions.getProfileOnboardingState).mockResolvedValue({
@@ -250,28 +238,16 @@ describe('OnboardingModal', () => {
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
+      expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
     });
 
-    // Click snooze button
-    const snoozeButton = screen.getByRole('button', { name: /Later/i });
-    await user.click(snoozeButton);
-
-    // Check localStorage was set
-    const snoozeValue = localStorageMock['charlie_onboarding_snooze_until'];
-    expect(snoozeValue).toBeDefined();
-    
-    const snoozeDate = new Date(snoozeValue!);
-    const expectedDate = new Date();
-    expectedDate.setDate(expectedDate.getDate() + 7);
-    
-    // Should be roughly 7 days from now (within 1 minute tolerance)
-    const diff = Math.abs(snoozeDate.getTime() - expectedDate.getTime());
-    expect(diff).toBeLessThan(60_000);
+    // Click Later button
+    const laterButton = screen.getByTestId('onboarding-snooze');
+    await user.click(laterButton);
 
     // Modal should close
     await waitFor(() => {
-      expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('onboarding-modal')).not.toBeInTheDocument();
     });
   });
 
@@ -287,16 +263,16 @@ describe('OnboardingModal', () => {
     render(<OnboardingModal userId={mockUserId} _testDelay={0} />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('Welcome to Charlie')).toBeInTheDocument();
+      expect(screen.getByTestId('onboarding-modal')).toBeInTheDocument();
     });
 
     // Click X button
-    const closeButton = screen.getByLabelText(/Close/i);
+    const closeButton = screen.getByTestId('onboarding-close');
     await user.click(closeButton);
 
     // Modal should close
     await waitFor(() => {
-      expect(screen.queryByText('Welcome to Charlie')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('onboarding-modal')).not.toBeInTheDocument();
     });
   });
 });

@@ -25,14 +25,13 @@ interface OnboardingModalProps {
   _testDelay?: number;
 }
 
-const SNOOZE_KEY = 'charlie_onboarding_snooze_until';
-const SNOOZE_DAYS = 7;
 const SHOW_DELAY_MS = 2000; // 2 seconds for testing (originally 10 seconds)
 const REMINDER_INTERVAL = 2; // Show reminder every 2 logins
 
 export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: OnboardingModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [answers, setAnswers] = useState<Partial<OnboardingAnswers>>({});
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // Fetch onboarding state
   const { data: onboardingState } = useQuery({
@@ -46,9 +45,11 @@ export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: Onbo
     mutationFn: (answers: OnboardingAnswers) => completeOnboarding(userId, answers),
     onSuccess: (result) => {
       if (result.success) {
-        handleClose();
-        // Show toast (you can integrate with a toast system here)
-        console.log('[Onboarding] Profile saved');
+        setShowSuccess(true);
+        // Close after showing success message
+        setTimeout(() => {
+          handleClose();
+        }, 2000);
       } else {
         console.error('[Onboarding] Error:', result.error);
       }
@@ -73,12 +74,6 @@ export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: Onbo
     const shouldShowReminder = isCompleted && login_count > 0 && login_count % REMINDER_INTERVAL === 0;
 
     if (!isCompleted || shouldShowReminder) {
-      // Check localStorage snooze
-      const snoozeUntil = localStorage.getItem(SNOOZE_KEY);
-      if (snoozeUntil && new Date(snoozeUntil) > new Date()) {
-        return; // Still snoozed
-      }
-
       // Show modal after delay
       const delay = _testDelay !== undefined ? _testDelay : SHOW_DELAY_MS;
       const timer = setTimeout(() => {
@@ -94,13 +89,6 @@ export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: Onbo
     onClose?.();
   };
 
-  const handleSnooze = () => {
-    const snoozeUntil = new Date();
-    snoozeUntil.setDate(snoozeUntil.getDate() + SNOOZE_DAYS);
-    localStorage.setItem(SNOOZE_KEY, snoozeUntil.toISOString());
-    handleClose();
-  };
-
   const handleSubmit = () => {
     if (isFormComplete) {
       saveMutation.mutate(answers as OnboardingAnswers);
@@ -112,12 +100,36 @@ export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: Onbo
 
   if (!isVisible) return null;
 
+  // Success state
+  if (showSuccess) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-md">
+        <Card data-testid="onboarding-success" className="relative w-full max-w-md p-8 shadow-2xl text-center">
+          <div className="mb-4">
+            <div className="mx-auto w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-semibold mb-2">
+              All done!
+            </h2>
+            <p className="text-muted-foreground">
+              Let's dig into your invests
+            </p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-md">
-      <Card className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl">
+      <Card data-testid="onboarding-modal" className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl">
         {/* Close button */}
         <button
-          onClick={handleSnooze}
+          data-testid="onboarding-close"
+          onClick={handleClose}
           className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Close"
         >
@@ -237,12 +249,14 @@ export function OnboardingModal({ userId, forceShow, onClose, _testDelay }: Onbo
         {/* Actions */}
         <div className="flex items-center justify-between mt-8 pt-6 border-t">
           <button
-            onClick={handleSnooze}
+            data-testid="onboarding-snooze"
+            onClick={handleClose}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Later
           </button>
           <Button
+            data-testid="onboarding-submit"
             onClick={handleSubmit}
             disabled={!isFormComplete || saveMutation.isPending}
             size="lg"
